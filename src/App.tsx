@@ -15,6 +15,8 @@ import DeliveryPage from "./pages/DeliveryPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import StorefrontPage from "./pages/StorefrontPage";
+import YourWebsitePage from "./pages/YourWebsitePage";
+import WebsitePage from "./pages/WebsitePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +39,8 @@ const App = () => (
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/storefront" element={<StorefrontPage />} />
+          <Route path="/your-website" element={<YourWebsitePage />} />
+          <Route path="/website/*" element={<WebsitePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

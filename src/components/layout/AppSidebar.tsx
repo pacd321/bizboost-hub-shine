@@ -11,6 +11,9 @@ import {
   CreditCard,
   MessageSquare,
   Globe,
+  Eye,
+  Settings,
+  ShoppingCart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -28,6 +31,11 @@ export function AppSidebar() {
       icon: Home,
     },
     {
+      name: 'Your Website',
+      href: '/your-website',
+      icon: Globe,
+    },
+    {
       name: 'Inventory',
       href: '/inventory',
       icon: Package,
@@ -35,7 +43,7 @@ export function AppSidebar() {
     {
       name: 'Marketplace',
       href: '/marketplace',
-      icon: Globe,
+      icon: ShoppingCart,
     },
     {
       name: 'Customers',
@@ -78,7 +86,7 @@ export function AppSidebar() {
         
         {routes.map((route) => {
           const Icon = route.icon;
-          const isActive = pathname === route.href;
+          const isActive = pathname === route.href || pathname.startsWith(`${route.href}/`);
           
           return (
             <Button

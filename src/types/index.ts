@@ -1,5 +1,7 @@
 
-export interface Product {
+// Export all the types here
+
+export type Product = {
   id: string;
   name: string;
   description: string;
@@ -10,9 +12,10 @@ export interface Product {
   sku: string;
   createdAt: string;
   updatedAt: string;
-}
+  visible?: boolean;
+};
 
-export interface Customer {
+export type Customer = {
   id: string;
   name: string;
   email: string;
@@ -22,9 +25,9 @@ export interface Customer {
   state: string;
   pincode: string;
   createdAt: string;
-}
+};
 
-export interface Transaction {
+export type Transaction = {
   id: string;
   type: 'income' | 'expense';
   amount: number;
@@ -32,13 +35,11 @@ export interface Transaction {
   category: string;
   date: string;
   productId?: string;
-  product?: Product;
-}
+};
 
-export interface SupportTicket {
+export type SupportTicket = {
   id: string;
   customerId: string;
-  customer?: Customer;
   subject: string;
   description: string;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
@@ -46,38 +47,49 @@ export interface SupportTicket {
   createdAt: string;
   updatedAt: string;
   assignedTo?: string;
-}
+};
 
-export interface SalesData {
+export type SalesData = {
   date: string;
   revenue: number;
-}
+};
 
-export interface ProductAnalytics {
+export type ProductAnalytics = {
   productId: string;
   productName: string;
   totalSold: number;
   revenue: number;
   profit: number;
-}
+};
 
-export interface MarketCompetitorData {
+export type MarketCompetitorData = {
   id: string;
   productName: string;
   yourPrice: number;
-  amazonPrice?: number;
-  flipkartPrice?: number;
-  otherPrice?: number;
+  amazonPrice: number;
+  flipkartPrice: number;
+  otherPrice: number;
   recommendedPrice: number;
   lastUpdated: string;
-}
+};
 
-export interface DeliveryOrder {
+export type DeliveryOrder = {
   id: string;
   orderId: string;
   customerId: string;
-  customer: Partial<Customer>;
-  items: Array<{productId: string, productName: string, quantity: number}>;
+  customer: {
+    name: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  items: Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+  }>;
   status: 'pending' | 'processing' | 'dispatched' | 'delivered' | 'cancelled';
   deliveryPartner?: string;
   trackingNumber?: string;
@@ -85,9 +97,9 @@ export interface DeliveryOrder {
   createdAt: string;
   updatedAt: string;
   deliveryDate?: string;
-}
+};
 
-export interface Warehouse {
+export type Warehouse = {
   id: string;
   name: string;
   address: string;
@@ -96,15 +108,43 @@ export interface Warehouse {
   pincode: string;
   manager: string;
   contact: string;
-}
+};
 
-export interface StockMovement {
+export type StockMovement = {
   id: string;
   productId: string;
-  product: Partial<Product>;
+  product: {
+    name: string;
+    sku: string;
+  };
   fromWarehouseId: string | null;
-  toWarehouseId: string;
+  toWarehouseId: string | null;
   quantity: number;
   reason: string;
   date: string;
-}
+};
+
+export type Order = {
+  id: string;
+  orderId: string;
+  customer: {
+    name: string;
+    email: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  items: Array<{
+    productId: string;
+    productName: string;
+    price: number;
+    quantity: number;
+  }>;
+  totalAmount: number;
+  status: 'delivered' | 'shipped' | 'processing' | 'pending' | 'cancelled';
+  paymentMethod: string;
+  createdAt: string;
+  warehouseId: string;
+  notes?: string;
+};
