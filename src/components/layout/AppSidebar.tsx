@@ -1,86 +1,103 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarHeader 
-} from '@/components/ui/sidebar';
-import { cn } from '@/lib/utils';
-import { 
-  Inbox, 
-  BarChart3, 
-  ShoppingBag, 
-  Users, 
-  Warehouse, 
-  Settings,
-  TrendingUp,
-  Truck
+import {
+  Home,
+  Package,
+  Users,
+  LineChart,
+  BarChart2,
+  Truck,
+  CreditCard,
+  MessageSquare,
+  Globe,
 } from 'lucide-react';
-
-type NavigationItem = {
-  name: string;
-  href: string;
-  icon: React.ElementType;
-  current?: boolean;
-};
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Sidebar } from '@/components/ui/sidebar';
+import { useToast } from '@/hooks/use-toast';
 
 export function AppSidebar() {
-  const location = useLocation();
+  const { pathname } = useLocation();
+  const { toast } = useToast();
   
-  const navigation: NavigationItem[] = [
-    { name: 'Dashboard', href: '/', icon: BarChart3, current: location.pathname === '/' },
-    { name: 'Inventory', href: '/inventory', icon: ShoppingBag, current: location.pathname.startsWith('/inventory') },
-    { name: 'Customers', href: '/customers', icon: Users, current: location.pathname.startsWith('/customers') },
-    { name: 'Support', href: '/support', icon: Inbox, current: location.pathname.startsWith('/support') },
-    { name: 'Market Intel', href: '/market-intel', icon: TrendingUp, current: location.pathname.startsWith('/market-intel') },
-    { name: 'Delivery & Warehouse', href: '/delivery', icon: Truck, current: location.pathname.startsWith('/delivery') },
-    { name: 'Settings', href: '/settings', icon: Settings, current: location.pathname.startsWith('/settings') },
+  const routes = [
+    {
+      name: 'Dashboard',
+      href: '/',
+      icon: Home,
+    },
+    {
+      name: 'Inventory',
+      href: '/inventory',
+      icon: Package,
+    },
+    {
+      name: 'Marketplace',
+      href: '/marketplace',
+      icon: Globe,
+    },
+    {
+      name: 'Customers',
+      href: '/customers',
+      icon: Users,
+    },
+    {
+      name: 'Market Intel',
+      href: '/market-intel',
+      icon: LineChart,
+    },
+    {
+      name: 'Market Insights',
+      href: '/market-insights',
+      icon: BarChart2,
+    },
+    {
+      name: 'Delivery',
+      href: '/delivery',
+      icon: Truck,
+    },
+    {
+      name: 'Transactions',
+      href: '/transactions',
+      icon: CreditCard,
+    },
+    {
+      name: 'Support',
+      href: '/support',
+      icon: MessageSquare,
+    }
   ];
 
   return (
-    <Sidebar>
-      <SidebarHeader className="flex items-center justify-center py-6">
-        <Link to="/" className="flex items-center space-x-2">
-          <Warehouse className="h-8 w-8 text-white" />
-          <span className="text-xl font-bold text-white">BizBoost</span>
-        </Link>
-      </SidebarHeader>
-      
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navigation.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild className={cn(
-                    item.current && "bg-sidebar-accent text-sidebar-accent-foreground"
-                  )}>
-                    <Link to={item.href} className="flex items-center">
-                      <item.icon className="h-5 w-5 mr-3" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      
-      <SidebarFooter className="px-4 py-5">
-        <div className="flex items-center justify-between text-sidebar-foreground/80 text-sm">
-          <span>© BizBoost {new Date().getFullYear()}</span>
+    <Sidebar className="border-r bg-background">
+      <div className="flex flex-col gap-2 p-4">
+        <div className="flex h-12 items-center px-2 font-semibold mb-4">
+          <span className="text-lg">BizBoost Hub</span>
         </div>
-      </SidebarFooter>
+        
+        {routes.map((route) => {
+          const Icon = route.icon;
+          const isActive = pathname === route.href;
+          
+          return (
+            <Button
+              key={route.href}
+              variant="ghost"
+              className={cn(
+                "justify-start gap-2",
+                isActive && "bg-accent"
+              )}
+              asChild
+            >
+              <Link to={route.href}>
+                <Icon className="h-5 w-5" />
+                <span>{route.name}</span>
+              </Link>
+            </Button>
+          );
+        })}
+      </div>
     </Sidebar>
   );
 }

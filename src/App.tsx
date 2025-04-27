@@ -13,6 +13,8 @@ import MarketInsightsPage from "./pages/MarketInsightsPage";
 import CompetitorPricingPage from "./pages/CompetitorPricingPage";
 import DeliveryPage from "./pages/DeliveryPage";
 import TransactionsPage from "./pages/TransactionsPage";
+import MarketplacePage from "./pages/MarketplacePage";
+import StorefrontPage from "./pages/StorefrontPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +35,8 @@ const App = () => (
           <Route path="/competitor-pricing" element={<CompetitorPricingPage />} />
           <Route path="/delivery" element={<DeliveryPage />} />
           <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/storefront" element={<StorefrontPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

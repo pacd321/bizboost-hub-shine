@@ -1,4 +1,3 @@
-
 import { 
   Product, 
   Customer, 
@@ -407,5 +406,159 @@ export const mockStockMovements: StockMovement[] = [
     quantity: 30,
     reason: 'New Inventory',
     date: '2023-09-14T10:15:00Z'
+  }
+];
+
+// Mock orders for marketplace
+export const mockOrders = [
+  {
+    id: '1',
+    orderId: 'ORD-001',
+    customer: {
+      name: 'Rahul Sharma',
+      email: 'rahul.sharma@example.com',
+      address: '123 Main St, Apartment 4B',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '400001'
+    },
+    items: [
+      {
+        productId: 'prod-1',
+        productName: 'Wireless Earbuds',
+        price: 2499,
+        quantity: 1
+      },
+      {
+        productId: 'prod-5',
+        productName: 'Smart Watch',
+        price: 4999,
+        quantity: 1
+      }
+    ],
+    totalAmount: 8848, // Including 18% GST
+    status: 'delivered',
+    paymentMethod: 'UPI Payment',
+    createdAt: '2023-04-10T08:30:00Z',
+    warehouseId: 'wh-1'
+  },
+  {
+    id: '2',
+    orderId: 'ORD-002',
+    customer: {
+      name: 'Priya Patel',
+      email: 'priya.patel@example.com',
+      address: '456 Garden Road',
+      city: 'Delhi',
+      state: 'Delhi',
+      pincode: '110001'
+    },
+    items: [
+      {
+        productId: 'prod-3',
+        productName: 'Laptop Sleeve',
+        price: 1299,
+        quantity: 1
+      }
+    ],
+    totalAmount: 1533, // Including 18% GST
+    status: 'shipped',
+    paymentMethod: 'Credit/Debit Card',
+    createdAt: '2023-04-12T10:15:00Z',
+    warehouseId: 'wh-2'
+  },
+  {
+    id: '3',
+    orderId: 'ORD-003',
+    customer: {
+      name: 'Amit Verma',
+      email: 'amit.verma@example.com',
+      address: '789 Tech Park',
+      city: 'Bangalore',
+      state: 'Karnataka',
+      pincode: '560001'
+    },
+    items: [
+      {
+        productId: 'prod-2',
+        productName: 'Ultra HD Monitor',
+        price: 15999,
+        quantity: 1
+      },
+      {
+        productId: 'prod-7',
+        productName: 'Wireless Keyboard',
+        price: 1799,
+        quantity: 1
+      },
+      {
+        productId: 'prod-8',
+        productName: 'Wireless Mouse',
+        price: 999,
+        quantity: 1
+      }
+    ],
+    totalAmount: 22139, // Including 18% GST
+    status: 'processing',
+    paymentMethod: 'Cash on Delivery',
+    createdAt: '2023-04-15T14:20:00Z',
+    warehouseId: 'wh-1',
+    notes: 'Please deliver between 5-7 PM on weekdays.'
+  },
+  {
+    id: '4',
+    orderId: 'ORD-004',
+    customer: {
+      name: 'Sneha Gupta',
+      email: 'sneha.gupta@example.com',
+      address: '101 Residence Courts',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      pincode: '600001'
+    },
+    items: [
+      {
+        productId: 'prod-6',
+        productName: 'Designer Handbag',
+        price: 3499,
+        quantity: 1
+      }
+    ],
+    totalAmount: 4129, // Including 18% GST
+    status: 'pending',
+    paymentMethod: 'UPI Payment',
+    createdAt: '2023-04-16T09:45:00Z',
+    warehouseId: 'wh-3'
+  },
+  {
+    id: '5',
+    orderId: 'ORD-005',
+    customer: {
+      name: 'Kiran Reddy',
+      email: 'kiran.reddy@example.com',
+      address: '202 Emerald Heights',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500001'
+    },
+    items: [
+      {
+        productId: 'prod-4',
+        productName: 'Power Bank',
+        price: 1499,
+        quantity: 2
+      },
+      {
+        productId: 'prod-10',
+        productName: 'Phone Case',
+        price: 499,
+        quantity: 3
+      }
+    ],
+    totalAmount: 5074, // Including 18% GST
+    status: 'delivered',
+    paymentMethod: 'Cash on Delivery',
+    createdAt: '2023-04-18T11:30:00Z',
+    warehouseId: 'wh-2'
   }
 ];

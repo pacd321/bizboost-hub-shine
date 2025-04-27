@@ -67,6 +67,8 @@ export function AddProductForm({ onSuccess, product }: AddProductFormProps) {
       cost: parseFloat(formData.cost) || 0,
       stock: parseInt(formData.stock) || 0,
       sku: formData.sku || `SKU-${Date.now()}`,
+      createdAt: product?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     // Simulate API call
