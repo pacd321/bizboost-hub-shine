@@ -437,7 +437,7 @@ export const mockOrders = [
       }
     ],
     totalAmount: 8848, // Including 18% GST
-    status: 'delivered',
+    status: 'delivered' as 'delivered',
     paymentMethod: 'UPI Payment',
     createdAt: '2023-04-10T08:30:00Z',
     warehouseId: 'wh-1'
@@ -462,7 +462,7 @@ export const mockOrders = [
       }
     ],
     totalAmount: 1533, // Including 18% GST
-    status: 'shipped',
+    status: 'shipped' as 'shipped',
     paymentMethod: 'Credit/Debit Card',
     createdAt: '2023-04-12T10:15:00Z',
     warehouseId: 'wh-2'
@@ -499,7 +499,7 @@ export const mockOrders = [
       }
     ],
     totalAmount: 22139, // Including 18% GST
-    status: 'processing',
+    status: 'processing' as 'processing',
     paymentMethod: 'Cash on Delivery',
     createdAt: '2023-04-15T14:20:00Z',
     warehouseId: 'wh-1',
@@ -525,7 +525,7 @@ export const mockOrders = [
       }
     ],
     totalAmount: 4129, // Including 18% GST
-    status: 'pending',
+    status: 'pending' as 'pending',
     paymentMethod: 'UPI Payment',
     createdAt: '2023-04-16T09:45:00Z',
     warehouseId: 'wh-3'
@@ -556,7 +556,7 @@ export const mockOrders = [
       }
     ],
     totalAmount: 5074, // Including 18% GST
-    status: 'delivered',
+    status: 'delivered' as 'delivered',
     paymentMethod: 'Cash on Delivery',
     createdAt: '2023-04-18T11:30:00Z',
     warehouseId: 'wh-2'
