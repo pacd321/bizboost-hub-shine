@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -60,7 +59,7 @@ const SupportPage = () => {
     // Update ticket status if it was open
     if (viewTicket && viewTicket.status === 'open') {
       const updatedTickets = tickets.map(t => 
-        t.id === viewTicket.id ? { ...t, status: 'in_progress' } : t
+        t.id === viewTicket.id ? { ...t, status: 'in_progress' as const } : t
       );
       setTickets(updatedTickets);
       setViewTicket({ ...viewTicket, status: 'in_progress' });
@@ -69,14 +68,14 @@ const SupportPage = () => {
     setReplyText('');
   };
 
-  const handleUpdateStatus = (status: string) => {
+  const handleUpdateStatus = (status: 'open' | 'in_progress' | 'resolved' | 'closed') => {
     if (!viewTicket) return;
 
     const updatedTickets = tickets.map(t => 
-      t.id === viewTicket.id ? { ...t, status: status as any } : t
+      t.id === viewTicket.id ? { ...t, status } : t
     );
     setTickets(updatedTickets);
-    setViewTicket({ ...viewTicket, status: status as any });
+    setViewTicket({ ...viewTicket, status });
 
     toast({
       title: "Status Updated",
