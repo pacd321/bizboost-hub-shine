@@ -12,22 +12,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { parseIndianNumber } from '@/lib/currency';
+import { parseIndianNumber, formatCurrency } from '@/lib/currency';
+import { Product } from '@/types';
 
 interface AddProductFormProps {
   onSuccess?: () => void;
+  product?: Product;
 }
 
-export function AddProductForm({ onSuccess }: AddProductFormProps) {
+export function AddProductForm({ onSuccess, product }: AddProductFormProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    price: '',
-    cost: '',
-    stock: '',
-    sku: '',
+    name: product?.name || '',
+    description: product?.description || '',
+    category: product?.category || '',
+    price: product ? String(product.price) : '',
+    cost: product ? String(product.cost) : '',
+    stock: product ? String(product.stock) : '',
+    sku: product?.sku || '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -55,24 +57,38 @@ export function AddProductForm({ onSuccess }: AddProductFormProps) {
       return;
     }
 
+    // Create product object
+    const productData: Product = {
+      id: product?.id || `prod-${Date.now()}`,
+      name: formData.name,
+      description: formData.description,
+      category: formData.category,
+      price: parseFloat(formData.price) || 0,
+      cost: parseFloat(formData.cost) || 0,
+      stock: parseInt(formData.stock) || 0,
+      sku: formData.sku || `SKU-${Date.now()}`,
+    };
+
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
       toast({
-        title: "Product Added",
-        description: `${formData.name} has been added to your inventory.`
+        title: product ? "Product Updated" : "Product Added",
+        description: `${formData.name} has been ${product ? 'updated' : 'added'} to your inventory.`
       });
       
       // Reset form
-      setFormData({
-        name: '',
-        description: '',
-        category: '',
-        price: '',
-        cost: '',
-        stock: '',
-        sku: '',
-      });
+      if (!product) {
+        setFormData({
+          name: '',
+          description: '',
+          category: '',
+          price: '',
+          cost: '',
+          stock: '',
+          sku: '',
+        });
+      }
 
       if (onSuccess) {
         onSuccess();
@@ -181,7 +197,7 @@ export function AddProductForm({ onSuccess }: AddProductFormProps) {
 
       <div className="flex justify-end">
         <Button type="submit" disabled={loading}>
-          {loading ? 'Adding Product...' : 'Add Product'}
+          {loading ? (product ? 'Updating Product...' : 'Adding Product...') : (product ? 'Update Product' : 'Add Product')}
         </Button>
       </div>
     </form>

@@ -2,10 +2,11 @@
 import React from 'react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CompetitorPricing } from '../components/market/CompetitorPricing';
-import { mockMarketData } from '../data/mockData';
+import { Button } from '@/components/ui/button';
 import { BarChart, PieChart, Cell, Legend, Bar, Pie, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { formatCurrency } from '@/lib/currency';
+import { ArrowRight, BarChart2, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const MarketIntelPage = () => {
   // Sample data for the charts
@@ -31,9 +32,16 @@ const MarketIntelPage = () => {
 
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
-            <CardHeader>
-              <CardTitle>Market Share by Category</CardTitle>
-              <CardDescription>Analysis of market share across product categories</CardDescription>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex justify-between items-center">
+                <span>Market Share Analysis</span>
+                <Button asChild variant="ghost" className="h-8 w-8 p-0">
+                  <Link to="/market-insights">
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardTitle>
+              <CardDescription>Top-level market share overview</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -58,13 +66,28 @@ const MarketIntelPage = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
+              <div className="mt-4 flex justify-center">
+                <Button asChild>
+                  <Link to="/market-insights">
+                    <BarChart2 className="h-4 w-4 mr-2" />
+                    View Detailed Analysis
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Sales Comparison</CardTitle>
-              <CardDescription>Your sales compared to competitors</CardDescription>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex justify-between items-center">
+                <span>Competitor Pricing</span>
+                <Button asChild variant="ghost" className="h-8 w-8 p-0">
+                  <Link to="/competitor-pricing">
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardTitle>
+              <CardDescription>Sales comparison with competitors</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -89,16 +112,22 @@ const MarketIntelPage = () => {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+              <div className="mt-4 flex justify-center">
+                <Button asChild>
+                  <Link to="/competitor-pricing">
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Compare Product Prices
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        <CompetitorPricing data={mockMarketData} />
-
         <Card>
           <CardHeader>
             <CardTitle>AI-Powered Market Insights</CardTitle>
-            <CardDescription>Recommendations based on market analysis</CardDescription>
+            <CardDescription>Key recommendations based on market analysis</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -106,8 +135,7 @@ const MarketIntelPage = () => {
                 <h3 className="font-medium text-blue-800 mb-2">Price Optimization</h3>
                 <p className="text-blue-700">
                   Our AI analysis suggests that increasing the price of "Wireless Headphones" by ₹200 could 
-                  increase profit margins without significantly affecting sales volume based on 
-                  competitor pricing and customer demand patterns.
+                  increase profit margins without significantly affecting sales volume.
                 </p>
               </div>
 
@@ -115,16 +143,16 @@ const MarketIntelPage = () => {
                 <h3 className="font-medium text-green-800 mb-2">Inventory Recommendations</h3>
                 <p className="text-green-700">
                   Demand for "Premium T-Shirts" is projected to increase by 30% in the next month 
-                  based on seasonal trends. Consider increasing your stock level to meet the anticipated demand.
+                  based on seasonal trends. Consider increasing your stock level.
                 </p>
               </div>
 
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                <h3 className="font-medium text-purple-800 mb-2">Competition Alert</h3>
-                <p className="text-purple-700">
-                  A new competitor has entered the market for "Stainless Steel Water Bottles" with aggressive pricing. 
-                  Consider running a limited-time promotion to maintain your market share.
-                </p>
+              <div className="pt-4 flex justify-center">
+                <Button asChild>
+                  <Link to="/market-insights?tab=recommendations">
+                    See All Insights
+                  </Link>
+                </Button>
               </div>
             </div>
           </CardContent>

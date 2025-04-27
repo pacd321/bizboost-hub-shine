@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -22,6 +22,7 @@ interface ProductListProps {
 export function ProductList({ products, onEdit }: ProductListProps) {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const filteredProducts = products.filter(product => 
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -30,25 +31,106 @@ export function ProductList({ products, onEdit }: ProductListProps) {
   );
 
   const handleExport = () => {
-    toast({
-      title: "Export Initiated",
-      description: "Your product data is being exported to CSV."
+    // Generate CSV content
+    const headers = ["Name", "SKU", "Category", "Price", "Cost", "Stock"];
+    const csvRows = [headers.join(",")];
+    
+    filteredProducts.forEach(product => {
+      const row = [
+        `"${product.name}"`,
+        `"${product.sku}"`,
+        `"${product.category}"`,
+        product.price,
+        product.cost,
+        product.stock
+      ];
+      csvRows.push(row.join(","));
     });
-    // In a real app, this would trigger the CSV download
+    
+    const csvContent = csvRows.join("\n");
+    
+    // Create a Blob and download link
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    
+    // Set up download link
+    link.setAttribute("href", url);
+    link.setAttribute("download", `inventory-products-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    
+    // Trigger download and clean up
+    link.click();
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 100);
+
+    toast({
+      title: "Export Successful",
+      description: `${filteredProducts.length} products have been exported to CSV.`
+    });
   };
 
   const handleImport = () => {
-    // In a real app, this would open a file input dialog
-    document.getElementById('import-file')?.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      toast({
-        title: "File Uploaded",
-        description: `${file.name} has been uploaded and is being processed.`
-      });
+      const reader = new FileReader();
+      
+      reader.onload = (event) => {
+        const content = event.target?.result as string;
+        if (!content) {
+          toast({
+            title: "Import Error",
+            description: "Could not read file content",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        try {
+          // Parse CSV content
+          const rows = content.split('\n');
+          const headers = rows[0].split(',');
+          
+          // Verify proper format
+          const requiredHeaders = ["Name", "SKU", "Category", "Price", "Stock"];
+          const hasRequiredHeaders = requiredHeaders.every(
+            header => headers.some(h => h.includes(header))
+          );
+          
+          if (!hasRequiredHeaders) {
+            toast({
+              title: "Import Error",
+              description: "CSV file does not have the required columns",
+              variant: "destructive"
+            });
+            return;
+          }
+          
+          // Count products to import
+          const productCount = rows.length - 1;
+          
+          toast({
+            title: "Import Successful",
+            description: `${productCount} products have been imported.`
+          });
+        } catch (error) {
+          toast({
+            title: "Import Error",
+            description: "Failed to process the CSV file",
+            variant: "destructive"
+          });
+        }
+      };
+      
+      reader.readAsText(file);
     }
   };
 
@@ -76,6 +158,7 @@ export function ProductList({ products, onEdit }: ProductListProps) {
             Import
           </Button>
           <input 
+            ref={fileInputRef}
             id="import-file" 
             type="file" 
             accept=".csv,.xlsx,.xls" 

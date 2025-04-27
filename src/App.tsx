@@ -9,6 +9,8 @@ import InventoryPage from "./pages/InventoryPage";
 import SupportPage from "./pages/SupportPage";
 import CustomersPage from "./pages/CustomersPage";
 import MarketIntelPage from "./pages/MarketIntelPage";
+import MarketInsightsPage from "./pages/MarketInsightsPage";
+import CompetitorPricingPage from "./pages/CompetitorPricingPage";
 import DeliveryPage from "./pages/DeliveryPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import NotFound from "./pages/NotFound";
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/support" element={<SupportPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/market-intel" element={<MarketIntelPage />} />
+          <Route path="/market-insights" element={<MarketInsightsPage />} />
+          <Route path="/competitor-pricing" element={<CompetitorPricingPage />} />
           <Route path="/delivery" element={<DeliveryPage />} />
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="*" element={<NotFound />} />
