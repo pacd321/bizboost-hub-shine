@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ProductCard } from '../components/website/ProductCard';
 import { WebsiteHeader } from '../components/website/WebsiteHeader';
