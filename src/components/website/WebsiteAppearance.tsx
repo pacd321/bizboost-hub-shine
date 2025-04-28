@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,20 +16,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { defaultTheme, useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
 export function WebsiteAppearance() {
   const [activeTab, setActiveTab] = useState('theme');
   const { toast } = useToast();
+  const { theme, updateTheme } = useTheme();
   
   const [settings, setSettings] = useState({
     theme: {
-      primaryColor: '#0066FF',
-      backgroundColor: '#FFFFFF',
-      textColor: '#222222',
-      fontFamily: 'Inter',
-      buttonStyle: 'rounded',
+      primaryColor: theme.primaryColor,
+      backgroundColor: theme.backgroundColor,
+      textColor: theme.textColor,
+      fontFamily: theme.fontFamily,
+      buttonStyle: theme.buttonStyle,
     },
     layout: {
       headerStyle: 'standard',
@@ -56,13 +57,34 @@ export function WebsiteAppearance() {
         [field]: value
       }
     }));
+
+    // Update theme context when theme settings change
+    if (section === 'theme') {
+      updateTheme({ [field]: value });
+    }
   };
   
   const handleSave = () => {
+    // Save all settings to localStorage
+    localStorage.setItem('websiteSettings', JSON.stringify(settings));
     toast({
       title: "Appearance Updated",
       description: "Your website appearance settings have been saved.",
     });
+  };
+
+  const handleReset = () => {
+    setSettings(prev => ({
+      ...prev,
+      theme: {
+        primaryColor: defaultTheme.primaryColor,
+        backgroundColor: defaultTheme.backgroundColor,
+        textColor: defaultTheme.textColor,
+        fontFamily: defaultTheme.fontFamily,
+        buttonStyle: defaultTheme.buttonStyle,
+      }
+    }));
+    updateTheme(defaultTheme);
   };
 
   return (
@@ -353,7 +375,7 @@ export function WebsiteAppearance() {
       
       <Card>
         <CardFooter className="flex justify-between">
-          <Button variant="outline">Reset</Button>
+          <Button variant="outline" onClick={handleReset}>Reset</Button>
           <Button onClick={handleSave}>Save Changes</Button>
         </CardFooter>
       </Card>

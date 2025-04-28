@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { ProductCard } from '../components/website/ProductCard';
-import { WebsiteHeader } from '../components/website/WebsiteHeader';
-import { WebsiteFooter } from '../components/website/WebsiteFooter';
-import { WebsiteHero } from '../components/website/WebsiteHero';
-import { WebsiteFeatures } from '../components/website/WebsiteFeatures';
-import { WebsiteTestimonials } from '../components/website/WebsiteTestimonials';
-import { WebsiteNewsletter } from '../components/website/WebsiteNewsletter';
-import { useToast } from '@/hooks/use-toast';
-import { mockProducts } from '../data/mockData';
-import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
-import { WebsiteAuth } from '../components/website/WebsiteAuth';
 import { Card, CardContent } from "@/components/ui/card";
-import { supabase } from '../supabaseClient'; // Add this import
+import { useTheme } from '@/context/ThemeContext';
+import { useToast } from '@/hooks/use-toast';
+import { Product } from '@/types';
+import { useEffect, useState } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import { WebsiteAbout } from '../components/website/WebsiteAbout';
+import { WebsiteAuth } from '../components/website/WebsiteAuth';
+import { WebsiteContact } from '../components/website/WebsiteContact';
+import { WebsiteFeatures } from '../components/website/WebsiteFeatures';
+import { WebsiteFooter } from '../components/website/WebsiteFooter';
+import { WebsiteHeader } from '../components/website/WebsiteHeader';
+import { WebsiteHero } from '../components/website/WebsiteHero';
+import { WebsiteNewsletter } from '../components/website/WebsiteNewsletter';
+import { WebsiteTestimonials } from '../components/website/WebsiteTestimonials';
+import { supabase } from '../supabaseClient';
 
 const WebsitePage = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -23,6 +25,8 @@ const WebsitePage = () => {
   const [products, setProducts] = useState([]);
   const { toast } = useToast();
   const [session, setSession] = useState(null);
+  const { theme } = useTheme();
+  const location = useLocation();
 
   useEffect(() => {
     const loadProducts = () => {
@@ -80,16 +84,14 @@ const WebsitePage = () => {
 
   const recordCustomer = async (customer: { name: string; email: string }) => {
     try {
-      // Insert or upsert customer into Supabase
       const { error } = await supabase
         .from('customers')
         .upsert([
           {
             name: customer.name,
             email: customer.email,
-            // Add more fields as needed
           }
-        ], { onConflict: 'email' }); // Prevent duplicates by email
+        ], { onConflict: 'email' });
       if (error) {
         console.error('Supabase error:', error.message);
       }
@@ -107,33 +109,26 @@ const WebsitePage = () => {
       description: `Welcome back, ${email}`,
     });
 
-    // Log customer data to dashboard
     console.log("Customer logged in:", { email });
-
-    // Record customer in Supabase
     await recordCustomer({ name: 'Customer User', email });
   };
 
-  
   const handlePurchase = (product: Product) => {
     if (!isAuthenticated) {
       setIsAuthModalOpen(true);
       return;
     }
 
-    // Update inventory (decrease stock)
     const updatedProducts = products.map(p => 
       p.id === product.id ? { ...p, stock: Math.max(0, p.stock - 1) } : p
     );
     setProducts(updatedProducts);
 
-    // Simulate a successful purchase
     toast({
       title: "Purchase Successful",
       description: `You have successfully purchased ${product.name}.`,
     });
 
-    // Log purchase to the dashboard (simulated)
     console.log("Purchase made:", { 
       product,
       customer: currentUser,
@@ -141,8 +136,59 @@ const WebsitePage = () => {
     });
   };
 
+  const HomeContent = () => (
+    <>
+      <WebsiteHero />
+      <section className="py-16" style={{ backgroundColor: theme.backgroundColor }}>
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Featured Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {filteredProducts.map((product) => (
+              <Card key={product.id} className="group overflow-hidden">
+                <div className="aspect-w-1 aspect-h-1">
+                  <img 
+                    src={product.imageUrl} 
+                    alt={product.name}
+                    className="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-200" 
+                  />
+                </div>
+                <CardContent className="p-6">
+                  <div>
+                    <p className="text-sm" style={{ color: theme.primaryColor }}>{product.category}</p>
+                    <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
+                    <div className="flex items-center justify-between">
+                      <p className="text-2xl font-bold">${product.price}</p>
+                      <Button 
+                        onClick={() => handleAddToCart(product)} 
+                        size="sm"
+                        style={{ 
+                          backgroundColor: theme.primaryColor,
+                          borderRadius: theme.buttonStyle === 'rounded' ? '0.375rem' : 
+                                    theme.buttonStyle === 'pill' ? '9999px' : '0'
+                        }}
+                      >
+                        Add to Cart
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+      <WebsiteFeatures />
+      <WebsiteTestimonials />
+      <WebsiteNewsletter />
+    </>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ 
+      backgroundColor: theme.backgroundColor,
+      color: theme.textColor,
+      fontFamily: theme.fontFamily
+    }}>
       <WebsiteHeader 
         isAuthenticated={isAuthenticated}
         userEmail={currentUser?.email}
@@ -158,43 +204,12 @@ const WebsitePage = () => {
       />
       
       <main>
-        <WebsiteHero />
-        
-        <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Featured Products</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredProducts.map((product) => (
-              <Card key={product.id} className="group overflow-hidden">
-                <div className="aspect-w-1 aspect-h-1">
-                  <img 
-                    src={product.imageUrl} 
-                    alt={product.name}
-                    className="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-200" 
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <div>
-                    <p className="text-sm text-blue-600 mb-2">{product.category}</p>
-                    <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
-                    <div className="flex items-center justify-between">
-                      <p className="text-2xl font-bold text-gray-900">${product.price}</p>
-                      <Button onClick={() => handleAddToCart(product)} size="sm">
-                        {/* <ShoppingCart className="h-4 w-4 mr-2" /> */}
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-        
-        <WebsiteFeatures />
-        <WebsiteTestimonials />
-        <WebsiteNewsletter />
+        <Routes>
+          <Route path="/" element={<HomeContent />} />
+          <Route path="/about" element={<WebsiteAbout />} />
+          <Route path="/contact" element={<WebsiteContact />} />
+          <Route path="*" element={<HomeContent />} />
+        </Routes>
       </main>
       
       <WebsiteFooter />
@@ -212,10 +227,7 @@ const WebsitePage = () => {
             description: `Welcome, ${name}!`,
           });
 
-          // Log new customer to dashboard
           console.log("New customer registered:", { name, email });
-
-          // Record customer in Supabase
           await recordCustomer({ name, email });
         }}
       />

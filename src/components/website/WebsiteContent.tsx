@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,28 @@ export function WebsiteContent() {
     heroSubtitle: 'Discover our extensive catalog of products designed to help your business thrive. From electronics to office supplies, we\'ve got you covered.',
     featureTitle: 'Why Choose Us',
     featureSubtitle: 'We provide the best services for your business needs',
+    features: [
+      {
+        icon: 'Package',
+        title: 'Quality Products',
+        description: 'All our products are carefully selected and tested for quality.'
+      },
+      {
+        icon: 'Truck',
+        title: 'Fast Delivery',
+        description: 'We ensure quick delivery to all locations across the country.'
+      },
+      {
+        icon: 'HeadsetIcon',
+        title: '24/7 Support',
+        description: 'Our customer support team is available round the clock.'
+      },
+      {
+        icon: 'ShieldCheck',
+        title: 'Secure Payments',
+        description: 'All transactions are processed securely with encryption.'
+      }
+    ]
   });
   
   const [aboutContent, setAboutContent] = useState({
@@ -38,6 +59,13 @@ export function WebsiteContent() {
   });
   
   const handleSave = () => {
+    // Save all content to localStorage
+    localStorage.setItem('websiteContent', JSON.stringify({
+      home: homeContent,
+      about: aboutContent,
+      contact: contactContent
+    }));
+    
     toast({
       title: "Content Updated",
       description: "Your website content has been saved successfully.",
@@ -95,6 +123,37 @@ export function WebsiteContent() {
                 onChange={(e) => setHomeContent({...homeContent, featureSubtitle: e.target.value})}
               />
             </div>
+
+            <h3 className="text-lg font-medium pt-4">Features</h3>
+            {homeContent.features.map((feature, index) => (
+              <div key={index} className="space-y-4 p-4 border rounded-lg">
+                <div className="grid gap-2">
+                  <Label htmlFor={`featureTitle${index}`}>Feature Title</Label>
+                  <Input
+                    id={`featureTitle${index}`}
+                    value={feature.title}
+                    onChange={(e) => {
+                      const newFeatures = [...homeContent.features];
+                      newFeatures[index].title = e.target.value;
+                      setHomeContent({...homeContent, features: newFeatures});
+                    }}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor={`featureDescription${index}`}>Feature Description</Label>
+                  <Textarea
+                    id={`featureDescription${index}`}
+                    value={feature.description}
+                    onChange={(e) => {
+                      const newFeatures = [...homeContent.features];
+                      newFeatures[index].description = e.target.value;
+                      setHomeContent({...homeContent, features: newFeatures});
+                    }}
+                    rows={2}
+                  />
+                </div>
+              </div>
+            ))}
           </Card>
         </TabsContent>
         
