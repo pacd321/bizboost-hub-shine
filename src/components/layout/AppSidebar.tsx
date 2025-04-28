@@ -95,7 +95,9 @@ export function AppSidebar() {
               )}
               asChild
             >
-              <Link to={route.href}>
+              <Link to={route.href} className={cn(
+                isActive && "text-black"
+              )}>
                 <Icon className="h-5 w-5" />
                 <span>{route.name}</span>
               </Link>
