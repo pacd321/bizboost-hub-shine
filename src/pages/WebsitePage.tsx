@@ -12,6 +12,7 @@ import { mockProducts } from '../data/mockData';
 import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { WebsiteAuth } from '../components/website/WebsiteAuth';
+import { supabase } from '../supabaseClient'; // Add this import
 
 const WebsitePage = () => {
   const [products, setProducts] = useState<Product[]>(mockProducts);
@@ -20,8 +21,27 @@ const WebsitePage = () => {
   const [currentUser, setCurrentUser] = useState<{name: string, email: string} | null>(null);
   const { toast } = useToast();
 
-  const handleLogin = (email: string, password: string) => {
-    // Simulate authentication
+  const recordCustomer = async (customer: { name: string; email: string }) => {
+    try {
+      // Insert or upsert customer into Supabase
+      const { error } = await supabase
+        .from('customers')
+        .upsert([
+          {
+            name: customer.name,
+            email: customer.email,
+            // Add more fields as needed
+          }
+        ], { onConflict: 'email' }); // Prevent duplicates by email
+      if (error) {
+        console.error('Supabase error:', error.message);
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+    }
+  };
+
+  const handleLogin = async (email: string, password: string) => {
     setIsAuthenticated(true);
     setCurrentUser({ name: 'Customer User', email });
     setIsAuthModalOpen(false);
@@ -32,6 +52,9 @@ const WebsitePage = () => {
 
     // Log customer data to dashboard
     console.log("Customer logged in:", { email });
+
+    // Record customer in Supabase
+    await recordCustomer({ name: 'Customer User', email });
   };
 
   const handleAddToCart = (product: Product) => {
@@ -122,7 +145,7 @@ const WebsitePage = () => {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
         onLogin={handleLogin}
-        onRegister={(name, email, password) => {
+        onRegister={async (name, email, password) => {
           setIsAuthenticated(true);
           setCurrentUser({ name, email });
           setIsAuthModalOpen(false);
@@ -130,9 +153,12 @@ const WebsitePage = () => {
             title: "Account created",
             description: `Welcome, ${name}!`,
           });
-          
+
           // Log new customer to dashboard
           console.log("New customer registered:", { name, email });
+
+          // Record customer in Supabase
+          await recordCustomer({ name, email });
         }}
       />
     </div>

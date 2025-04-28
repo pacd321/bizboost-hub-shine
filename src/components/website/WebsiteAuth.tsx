@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { supabase } from '../../supabaseClient'; // Adjust path as needed
+import { useToast } from '@/hooks/use-toast'; // Optional: for user feedback
 
 interface WebsiteAuthProps {
   isOpen: boolean;
@@ -20,15 +22,83 @@ export function WebsiteAuth({ isOpen, onClose, onLogin, onRegister }: WebsiteAut
   const [registerName, setRegisterName] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(loginEmail, loginPassword);
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
+    setLoading(false);
+    if (error) {
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else if (data.user) {
+      onLogin(loginEmail, loginPassword);
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${loginEmail}`,
+      });
+      onClose();
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    onRegister(registerName, registerEmail, registerPassword);
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: registerEmail,
+      password: registerPassword,
+      options: {
+        data: { name: registerName },
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast({
+        title: "Registration Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else if (data.user) {
+      // Insert into customers table
+      try {
+        const { error: insertError } = await supabase
+          .from('customers')
+          .insert([
+            {
+              name: registerName,
+              email: registerEmail,
+              // Add more fields if needed
+            }
+          ]);
+        if (insertError) {
+          toast({
+            title: "Customer Not Saved",
+            description: insertError.message,
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        toast({
+          title: "Unexpected Error",
+          description: "Could not save customer to database.",
+          variant: "destructive",
+        });
+      }
+      onRegister(registerName, registerEmail, registerPassword);
+      toast({
+        title: "Registration Successful",
+        description: `Welcome, ${registerName}! Please check your email to verify your account.`,
+      });
+      onClose();
+    }
   };
 
   return (
@@ -67,7 +137,9 @@ export function WebsiteAuth({ isOpen, onClose, onLogin, onRegister }: WebsiteAut
                   required
                 />
               </div>
-              <Button type="submit" className="w-full">Login</Button>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+              </Button>
             </form>
           </TabsContent>
           
@@ -105,7 +177,9 @@ export function WebsiteAuth({ isOpen, onClose, onLogin, onRegister }: WebsiteAut
                   required
                 />
               </div>
-              <Button type="submit" className="w-full">Register</Button>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Registering..." : "Register"}
+              </Button>
             </form>
           </TabsContent>
         </Tabs>
