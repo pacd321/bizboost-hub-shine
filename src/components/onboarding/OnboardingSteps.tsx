@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Check } from 'lucide-react';
+import { useState } from 'react';
 
 interface OnboardingStepsProps {
   onComplete?: () => void;
@@ -28,7 +28,7 @@ export function OnboardingSteps({ onComplete }: OnboardingStepsProps) {
       description: "A complete business management platform for small businesses",
       content: (
         <div className="space-y-4 py-4">
-          <p>BizBoost helps you manage your business efficiently with powerful features:</p>
+          <p>StartKarohelps you manage your business efficiently with powerful features:</p>
           <ul className="space-y-2">
             <li className="flex items-center">
               <Check className="h-5 w-5 text-green-500 mr-2" />
@@ -118,7 +118,7 @@ export function OnboardingSteps({ onComplete }: OnboardingStepsProps) {
           </div>
           <h3 className="text-xl font-medium mt-4">All Set!</h3>
           <p className="text-gray-500">
-            Your BizBoost dashboard is ready. Start exploring the features and boost your business efficiency today!
+            Your StartKarodashboard is ready. Start exploring the features and boost your business efficiency today!
           </p>
         </div>
       )

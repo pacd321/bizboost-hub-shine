@@ -1,17 +1,16 @@
 
-import React from 'react';
 
 export function WebsiteTestimonials() {
   const testimonials = [
     {
       name: 'Rahul Sharma',
       position: 'CEO, TechStart',
-      content: 'BizBoost Shop has been a reliable partner for all our office supply needs. Their products are top-notch and the customer service is excellent.'
+      content: 'StartKaroShop has been a reliable partner for all our office supply needs. Their products are top-notch and the customer service is excellent.'
     },
     {
       name: 'Priya Patel',
       position: 'Owner, Fashion Boutique',
-      content: 'I\'ve been ordering from BizBoost for over a year now. The quality is consistent and delivery is always on time.'
+      content: 'I\'ve been ordering from StartKarofor over a year now. The quality is consistent and delivery is always on time.'
     },
     {
       name: 'Amit Kumar',

@@ -1,8 +1,6 @@
 
-import React from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +9,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Bell, User, LogOut, Settings } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useToast } from '@/hooks/use-toast';
+import { Bell, LogOut, Settings, User } from 'lucide-react';
 
 export function AppHeader() {
   const { toast } = useToast();
@@ -29,7 +28,7 @@ export function AppHeader() {
       <SidebarTrigger />
       
       <div className="flex-1">
-        <h1 className="text-lg font-semibold md:text-xl">BizBoost Hub</h1>
+        <h1 className="text-lg font-semibold md:text-xl">StartKaroHub</h1>
       </div>
 
       <div className="flex items-center gap-4">

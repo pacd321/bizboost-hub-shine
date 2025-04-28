@@ -1,5 +1,3 @@
-
-import React, { useState } from 'react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Eye, Settings, Plus, ShoppingCart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { WebsiteSettings } from '../components/website/WebsiteSettings';
-import { WebsiteProducts } from '../components/website/WebsiteProducts';
+import WebsiteProducts from '../components/website/WebsiteProducts';
 import { WebsiteAppearance } from '../components/website/WebsiteAppearance';
 import { WebsiteContent } from '../components/website/WebsiteContent';
+import { useState } from 'react';
 
 const YourWebsitePage = () => {
   const [activeTab, setActiveTab] = useState('products');
@@ -59,10 +58,10 @@ const YourWebsitePage = () => {
                     <CardTitle>Website Products</CardTitle>
                     <CardDescription>Manage products displayed on your website</CardDescription>
                   </div>
-                  <Button size="sm">
+                  {/* <Button size="sm">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Product
-                  </Button>
+                  </Button> */}
                 </div>
               </CardHeader>
               <CardContent>

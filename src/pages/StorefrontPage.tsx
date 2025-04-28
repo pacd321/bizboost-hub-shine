@@ -1,18 +1,47 @@
-
-import React, { useState, useEffect } from 'react';
-import { StorefrontLayout } from '../components/marketplace/StorefrontLayout';
+import { useToast } from '@/hooks/use-toast';
+import { Product } from '@/types';
+import { useEffect, useState } from 'react';
+import { Checkout } from '../components/marketplace/Checkout';
 import { ProductGrid } from '../components/marketplace/ProductGrid';
 import { ProductView } from '../components/marketplace/ProductView';
 import { ShoppingCart } from '../components/marketplace/ShoppingCart';
-import { Checkout } from '../components/marketplace/Checkout';
-import { mockProducts } from '../data/mockData';
-import { Product } from '@/types';
+import { StorefrontLayout } from '../components/marketplace/StorefrontLayout';
 
 const StorefrontPage = () => {
-  const [products] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [cartItems, setCartItems] = useState<Array<{product: Product, quantity: number}>>([]);
   const [isCheckout, setIsCheckout] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+  const [session, setSession] = useState(null);
+  
+  useEffect(() => {
+    const loadProducts = () => {
+      const storedProducts = localStorage.getItem('products');
+      if (storedProducts) {
+        const allProducts = JSON.parse(storedProducts);
+        // Filter out hidden products
+        const visibleProducts = allProducts.filter((product: Product) => !product.hidden);
+        setProducts(visibleProducts);
+      }
+    };
+
+    loadProducts();
+
+    const handleStorageChange = (event) => {
+      if (event.key === 'products') {
+        loadProducts();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
   
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
   

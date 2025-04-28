@@ -1,4 +1,3 @@
-
 // Export all the types here
 
 export type Product = {
@@ -13,6 +12,7 @@ export type Product = {
   createdAt: string;
   updatedAt: string;
   visible?: boolean;
+  hidden?: boolean;
 };
 
 export type Customer = {

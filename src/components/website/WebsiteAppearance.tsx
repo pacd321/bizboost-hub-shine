@@ -1,16 +1,14 @@
 
-import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Card, 
-  CardContent, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -18,7 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 export function WebsiteAppearance() {
   const [activeTab, setActiveTab] = useState('theme');
@@ -41,7 +41,7 @@ export function WebsiteAppearance() {
       showTestimonials: true,
     },
     branding: {
-      storeName: 'BizBoost Shop',
+      storeName: 'StartKaroShop',
       logoUrl: '',
       favicon: '',
       tagline: 'Quality Products for Your Business',

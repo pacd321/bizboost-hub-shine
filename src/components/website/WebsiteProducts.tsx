@@ -1,244 +1,266 @@
+import { useState, useEffect } from "react";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { Upload, Plus, Search, FileSpreadsheet, Trash2, Pencil } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import AddProductForm from "@/components/dashboard/AddProductForm";
+import { parseCSV, type ProductData } from "@/utils/csvParser";
 
-import React, { useState } from 'react';
-import { mockProducts } from '../../data/mockData';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { formatCurrency } from '@/lib/currency';
-import { Eye, Edit, Trash, Check, X } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Product } from '@/types';
-import { useToast } from '@/hooks/use-toast';
+const initialProducts = [
+];
 
-export function WebsiteProducts() {
-  const [products, setProducts] = useState([...mockProducts]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const ProductsManage = () => {
   const { toast } = useToast();
-  
-  // Filtered products based on search term
-  const filteredProducts = products.filter(
-    product => 
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
-  const handleEditProduct = (product: Product) => {
-    setEditProduct({...product});
-    setIsDialogOpen(true);
-  };
-  
-  const handleSaveProduct = () => {
-    if (editProduct) {
-      const newProducts = products.map(p => 
-        p.id === editProduct.id ? editProduct : p
-      );
-      setProducts(newProducts);
-      setIsDialogOpen(false);
-      toast({
-        title: "Product Updated",
-        description: `${editProduct.name} has been updated successfully.`,
-      });
+  const [products, setProducts] = useState(initialProducts);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const storedProducts = localStorage.getItem('products');
+    if (storedProducts) {
+      setProducts(JSON.parse(storedProducts));
+    } else {
+      localStorage.setItem('products', JSON.stringify(initialProducts));
     }
+  }, []);
+
+  const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const text = e.target?.result as string;
+        const newProducts = parseCSV(text);
+        
+        const existingProducts = JSON.parse(localStorage.getItem('products') || '[]');
+        const mergedProducts = [...existingProducts];
+        
+        newProducts.forEach(newProduct => {
+          const existingIndex = mergedProducts.findIndex(p => p.name === newProduct.name);
+          if (existingIndex >= 0) {
+            mergedProducts[existingIndex] = { ...newProduct, id: mergedProducts[existingIndex].id };
+          } else {
+            mergedProducts.push({ ...newProduct, id: Math.max(0, ...mergedProducts.map(p => p.id)) + 1 });
+          }
+        });
+
+        localStorage.setItem('products', JSON.stringify(mergedProducts));
+        setProducts(mergedProducts);
+        
+        window.dispatchEvent(new Event('storage'));
+        
+        toast({
+          title: "Products Imported",
+          description: `Successfully imported ${newProducts.length} products.`,
+        });
+      } catch (error) {
+        console.error('Error parsing CSV:', error);
+        toast({
+          title: "Import Failed",
+          description: "Failed to import products. Please check your CSV format.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    reader.readAsText(file);
   };
-  
-  const handleDeleteProduct = (id: string) => {
-    const newProducts = products.filter(p => p.id !== id);
-    setProducts(newProducts);
-    toast({
-      title: "Product Removed",
-      description: "The product has been removed from your website.",
-    });
-  };
-  
-  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: keyof Product) => {
-    if (editProduct) {
-      setEditProduct({
-        ...editProduct,
-        [field]: e.target.value
-      });
-    }
-  };
-  
-  const handleVisibilityToggle = (id: string, visible: boolean) => {
-    const newProducts = products.map(p => 
-      p.id === id ? { ...p, visible } : p
+
+  const toggleProductVisibility = (productId: number) => {
+    const updatedProducts = products.map(product => 
+      product.id === productId ? { ...product, hidden: !product.hidden } : product
     );
-    setProducts(newProducts);
+    
+    setProducts(updatedProducts);
+    localStorage.setItem('products', JSON.stringify(updatedProducts));
+    window.dispatchEvent(new Event('storage'));
+    
     toast({
-      title: visible ? "Product Visible" : "Product Hidden",
-      description: visible 
-        ? "The product is now visible on your website." 
-        : "The product has been hidden from your website.",
+      title: "Product Updated",
+      description: "Product visibility has been updated.",
     });
   };
+
+  const handleDeleteProduct = (productId: number) => {
+    const updatedProducts = products.filter(product => product.id !== productId);
+    setProducts(updatedProducts);
+    localStorage.setItem('products', JSON.stringify(updatedProducts));
+    window.dispatchEvent(new Event('storage'));
+    
+    toast({
+      title: "Product Deleted",
+      description: "Product has been removed from inventory.",
+    });
+  };
+
+  const handleEditProduct = (productId: number) => {
+    toast({
+      title: "Edit Product",
+      description: "Product editing will be implemented soon.",
+    });
+  };
+
+  const filteredProducts = products.filter(product => 
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Input
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1"
-        />
-        <Button>
-          Add New Product
-        </Button>
+    <DashboardLayout>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Products</h2>
+          <p className="text-gray-500 mt-1">
+            Manage your product catalog.
+          </p>
+        </div>
+        
+        <div className="flex gap-2 w-full md:w-auto">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Product
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Product</DialogTitle>
+                <DialogDescription>
+                  Enter the details for your new product.
+                </DialogDescription>
+              </DialogHeader>
+              <AddProductForm />
+            </DialogContent>
+          </Dialog>
+          
+          <Button variant="outline">
+            <label className="flex items-center cursor-pointer">
+              <Upload className="h-4 w-4 mr-2" />
+              Import CSV
+              <input
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={handleCSVUpload}
+              />
+            </label>
+          </Button>
+        </div>
       </div>
       
-      <div className="overflow-hidden rounded-lg border">
-        <table className="w-full">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Name</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Price</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Category</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Stock</th>
-              <th className="text-center py-3 px-4 text-xs font-medium text-muted-foreground">Visible</th>
-              <th className="text-center py-3 px-4 text-xs font-medium text-muted-foreground">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {filteredProducts.map((product) => (
-              <tr key={product.id} className="hover:bg-muted/50">
-                <td className="py-3 px-4">
-                  <div className="font-medium">{product.name}</div>
-                  <div className="text-xs text-muted-foreground line-clamp-1">{product.description}</div>
-                </td>
-                <td className="py-3 px-4">{formatCurrency(product.price)}</td>
-                <td className="py-3 px-4">
-                  <Badge variant="secondary">{product.category}</Badge>
-                </td>
-                <td className="py-3 px-4">
-                  {product.stock > 0 ? (
-                    <span className="text-green-600">{product.stock}</span>
-                  ) : (
-                    <span className="text-red-600">Out of stock</span>
-                  )}
-                </td>
-                <td className="py-3 px-4 text-center">
-                  <Switch 
-                    checked={product.visible !== false}
-                    onCheckedChange={(checked) => handleVisibilityToggle(product.id, checked)}
-                  />
-                </td>
-                <td className="py-3 px-4">
-                  <div className="flex justify-center gap-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => window.open(`/website/product/${product.id}`, '_blank')}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleEditProduct(product)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => handleDeleteProduct(product.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>CSV Import Instructions</CardTitle>
+          <CardDescription>
+            Follow these guidelines for successful product imports.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center mb-4">
+            <FileSpreadsheet className="h-8 w-8 text-blue-500 mr-2" />
+            <div>
+              <h3 className="font-medium">CSV Format</h3>
+              <p className="text-sm text-gray-500">
+                Your CSV file should include columns for: name, price, description, category, imageUrl, inStock
+              </p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm">
+            Download Template
+          </Button>
+        </CardContent>
+      </Card>
       
-      {/* Edit Product Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
-          </DialogHeader>
-          
-          {editProduct && (
-            <div className="space-y-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input 
-                  id="name" 
-                  value={editProduct.name} 
-                  onChange={(e) => handleFieldChange(e, 'name')}
-                />
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
-                <Input 
-                  id="description" 
-                  value={editProduct.description} 
-                  onChange={(e) => handleFieldChange(e, 'description')}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="price">Price</Label>
-                  <Input 
-                    id="price" 
-                    type="number" 
-                    value={editProduct.price} 
-                    onChange={(e) => handleFieldChange(e, 'price')}
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="stock">Stock</Label>
-                  <Input 
-                    id="stock" 
-                    type="number" 
-                    value={editProduct.stock} 
-                    onChange={(e) => handleFieldChange(e, 'stock')}
-                  />
-                </div>
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="category">Category</Label>
-                <Input 
-                  id="category" 
-                  value={editProduct.category} 
-                  onChange={(e) => handleFieldChange(e, 'category')}
-                />
-              </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <CardTitle>Product Inventory</CardTitle>
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search products..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-          )}
-          
-          <DialogFooter>
-            <div className="flex justify-between w-full">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                <X className="mr-2 h-4 w-4" />
-                Cancel
-              </Button>
-              
-              <Button onClick={handleSaveProduct}>
-                <Check className="mr-2 h-4 w-4" />
-                Save Changes
-              </Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Visibility</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell>${product.price}</TableCell>
+                      <TableCell>{product.category}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <div className={`h-2 w-2 rounded-full mr-2 ${product.inStock ? 'bg-green-500' : 'bg-red-500'}`} />
+                          {product.inStock ? 'In Stock' : 'Out of Stock'}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Switch 
+                          checked={!product.hidden}
+                          onCheckedChange={() => toggleProductVisibility(product.id)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleEditProduct(product.id)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-4 text-gray-500">
+                      No products found matching your search.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    </DashboardLayout>
   );
-}
+};
+
+export default ProductsManage;

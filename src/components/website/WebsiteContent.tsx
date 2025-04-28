@@ -1,13 +1,13 @@
 
-import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Check } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { Check } from 'lucide-react';
+import { useState } from 'react';
 
 export function WebsiteContent() {
   const [activeTab, setActiveTab] = useState('home');
@@ -23,7 +23,7 @@ export function WebsiteContent() {
   const [aboutContent, setAboutContent] = useState({
     title: 'About Our Company',
     subtitle: 'Learn more about who we are and what we do',
-    story: 'Founded in 2020, BizBoost Shop started as a small online store catering to local businesses. Over the years, we have grown into a trusted supplier of quality products for businesses across the country.\n\nOur mission is to provide businesses with the tools they need to succeed at competitive prices, with excellent customer service.',
+    story: 'Founded in 2020, StartKaroShop started as a small online store catering to local businesses. Over the years, we have grown into a trusted supplier of quality products for businesses across the country.\n\nOur mission is to provide businesses with the tools they need to succeed at competitive prices, with excellent customer service.',
     mission: 'To empower businesses with high-quality products and exceptional service.',
     vision: 'To become the leading online marketplace for business supplies in the country.',
   });

@@ -1,14 +1,14 @@
 
-import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 export function WebsiteSettings() {
   const [activeTab, setActiveTab] = useState('general');
@@ -19,8 +19,8 @@ export function WebsiteSettings() {
     timeZone: 'Asia/Kolkata',
     currency: 'INR',
     dateFormat: 'DD/MM/YYYY',
-    metaTitle: 'BizBoost Shop - Quality Products for Business',
-    metaDescription: 'BizBoost Shop offers high-quality products for businesses at competitive prices. Shop our extensive catalog now.',
+    metaTitle: 'StartKaroShop - Quality Products for Business',
+    metaDescription: 'StartKaroShop offers high-quality products for businesses at competitive prices. Shop our extensive catalog now.',
   });
   
   const [ecommerceSettings, setEcommerceSettings] = useState({

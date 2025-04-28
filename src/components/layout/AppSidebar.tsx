@@ -1,24 +1,21 @@
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import {
-  Home,
-  Package,
-  Users,
-  LineChart,
-  BarChart2,
-  Truck,
-  CreditCard,
-  MessageSquare,
-  Globe,
-  Eye,
-  Settings,
-  ShoppingCart,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import {
+  BarChart2,
+  CreditCard,
+  Globe,
+  Home,
+  LineChart,
+  MessageSquare,
+  Package,
+  ShoppingCart,
+  Truck,
+  Users
+} from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 export function AppSidebar() {
   const { pathname } = useLocation();
@@ -81,7 +78,7 @@ export function AppSidebar() {
     <Sidebar className="border-r bg-background">
       <div className="flex flex-col gap-2 p-4">
         <div className="flex h-12 items-center px-2 font-semibold mb-4">
-          <span className="text-lg">BizBoost Hub</span>
+          <span className="text-lg">StartKaroHub</span>
         </div>
         
         {routes.map((route) => {

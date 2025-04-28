@@ -11,14 +11,72 @@ import { mockProducts } from '../data/mockData';
 import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { WebsiteAuth } from '../components/website/WebsiteAuth';
+import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from '../supabaseClient'; // Add this import
 
 const WebsitePage = () => {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<{name: string, email: string} | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [products, setProducts] = useState([]);
   const { toast } = useToast();
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    const loadProducts = () => {
+      const storedProducts = localStorage.getItem('products');
+      if (storedProducts) {
+        setProducts(JSON.parse(storedProducts));
+      }
+    };
+
+    loadProducts();
+
+    const handleStorageChange = (event) => {
+      if (event.key === 'products') {
+        loadProducts();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Setup auth listener
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  const handleAddToCart = (product) => {
+    if (!session) {
+      toast({
+        title: "Login Required",
+        description: "Please login to add items to cart",
+      });
+      return;
+    }
+
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
+
+  const filteredProducts = products.filter(product => 
+    !product.hidden && 
+    (product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    product.category.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   const recordCustomer = async (customer: { name: string; email: string }) => {
     try {
@@ -56,21 +114,7 @@ const WebsitePage = () => {
     await recordCustomer({ name: 'Customer User', email });
   };
 
-  const handleAddToCart = (product: Product) => {
-    if (!isAuthenticated) {
-      setIsAuthModalOpen(true);
-      return;
-    }
-
-    toast({
-      title: "Added to Cart",
-      description: `${product.name} has been added to your cart.`,
-    });
-
-    // Update analytics in the backend (simulated)
-    console.log("Product added to cart:", product);
-  };
-
+  
   const handlePurchase = (product: Product) => {
     if (!isAuthenticated) {
       setIsAuthModalOpen(true);
@@ -116,22 +160,37 @@ const WebsitePage = () => {
       <main>
         <WebsiteHero />
         
-        <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center">Featured Products</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                onAddToCart={() => handleAddToCart(product)}
-                onPurchase={() => handlePurchase(product)}
-              />
+        <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Featured Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {filteredProducts.map((product) => (
+              <Card key={product.id} className="group overflow-hidden">
+                <div className="aspect-w-1 aspect-h-1">
+                  <img 
+                    src={product.imageUrl} 
+                    alt={product.name}
+                    className="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-200" 
+                  />
+                </div>
+                <CardContent className="p-6">
+                  <div>
+                    <p className="text-sm text-blue-600 mb-2">{product.category}</p>
+                    <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
+                    <div className="flex items-center justify-between">
+                      <p className="text-2xl font-bold text-gray-900">${product.price}</p>
+                      <Button onClick={() => handleAddToCart(product)} size="sm">
+                        {/* <ShoppingCart className="h-4 w-4 mr-2" /> */}
+                        Add to Cart
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-          <div className="mt-8 text-center">
-            <Button variant="outline" size="lg">View All Products</Button>
-          </div>
-        </section>
+        </div>
+      </section>
         
         <WebsiteFeatures />
         <WebsiteTestimonials />

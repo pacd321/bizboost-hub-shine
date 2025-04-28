@@ -1,10 +1,7 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ShoppingCart, User, Menu, X, Search } from 'lucide-react';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -12,7 +9,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Menu, Search, ShoppingCart, User, X } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface WebsiteHeaderProps {
   isAuthenticated: boolean;
@@ -32,7 +32,7 @@ export function WebsiteHeader({ isAuthenticated, userEmail, onLoginClick, onLogo
           {/* Logo and brand */}
           <div className="flex items-center">
             <Link to="/website" className="text-2xl font-bold text-primary">
-              BizBoost Shop
+              StartKaroShop
             </Link>
           </div>
 
