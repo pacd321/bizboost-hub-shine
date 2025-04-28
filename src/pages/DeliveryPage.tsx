@@ -1,22 +1,24 @@
-
-import React, { useState } from 'react';
-import { DashboardLayout } from '../components/layout/DashboardLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  mockDeliveryOrders, 
-  mockWarehouses,
-  mockStockMovements
-} from '../data/mockData';
+import { useToast } from '@/hooks/use-toast';
+import { storage } from '@/lib/storage';
+import { DeliveryOrder } from '@/types';
+import { useEffect, useState } from 'react';
 import { DeliveryOrderList } from '../components/delivery/DeliveryOrderList';
 import { WarehouseManager } from '../components/delivery/WarehouseManager';
-import { DeliveryOrder } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { DashboardLayout } from '../components/layout/DashboardLayout';
+import { mockWarehouses } from '../data/mockData';
 
 const DeliveryPage = () => {
   const [activeTab, setActiveTab] = useState('orders');
-  const [deliveryOrders, setDeliveryOrders] = useState<DeliveryOrder[]>(mockDeliveryOrders);
+  const [deliveryOrders, setDeliveryOrders] = useState<DeliveryOrder[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Load orders from localStorage
+    const orders = storage.getOrders();
+    setDeliveryOrders(orders);
+  }, []);
 
   const handleUpdateStatus = (orderId: string, newStatus: string) => {
     const updatedOrders = deliveryOrders.map(order => 
@@ -24,6 +26,9 @@ const DeliveryPage = () => {
     );
     
     setDeliveryOrders(updatedOrders);
+    
+    // Update localStorage
+    localStorage.setItem('bizboost_orders', JSON.stringify(updatedOrders));
     
     toast({
       title: "Status Updated",
@@ -101,7 +106,7 @@ const DeliveryPage = () => {
           <TabsContent value="warehouse" className="space-y-6">
             <WarehouseManager 
               warehouses={mockWarehouses}
-              stockMovements={mockStockMovements}
+              stockMovements={[]}
             />
           </TabsContent>
         </Tabs>

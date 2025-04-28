@@ -1,19 +1,20 @@
 // Export all the types here
 
-export type Product = {
+export interface Product {
   id: string;
   name: string;
-  description: string;
+  sku: string;
   category: string;
   price: number;
   cost: number;
   stock: number;
-  sku: string;
-  createdAt: string;
-  updatedAt: string;
-  visible?: boolean;
+  description?: string;
+  imageUrl?: string;
   hidden?: boolean;
-};
+  inStock?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export type Customer = {
   id: string;

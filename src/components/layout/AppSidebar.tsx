@@ -47,11 +47,11 @@ export function AppSidebar() {
       href: '/customers',
       icon: Users,
     },
-    {
-      name: 'Market Intel',
-      href: '/market-intel',
-      icon: LineChart,
-    },
+      // {
+      //   name: 'Market Intel',
+      //   href: '/market-intel',
+      //   icon: LineChart,
+      // },
     {
       name: 'Market Insights',
       href: '/market-insights',

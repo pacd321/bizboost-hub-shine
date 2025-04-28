@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const InventoryPage = () => {
   const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('add');
   const [editProductOpen, setEditProductOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const { toast } = useToast();
@@ -60,7 +60,7 @@ const InventoryPage = () => {
       title: "OCR Data Processed",
       description: `${data.items.length} items added to your inventory from the invoice.`
     });
-    setActiveTab('products');
+    setActiveTab('ocr');
   };
 
   return (
@@ -75,7 +75,7 @@ const InventoryPage = () => {
             <TabsList>
               <TabsTrigger value="products">Products</TabsTrigger>
               <TabsTrigger value="add">Add Manually</TabsTrigger>
-              <TabsTrigger value="ocr">Add via OCR</TabsTrigger>
+              {/* <TabsTrigger value="ocr">Add via OCR</TabsTrigger> */}
             </TabsList>
           </div>
 

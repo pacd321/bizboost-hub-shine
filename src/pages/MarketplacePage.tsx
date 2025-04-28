@@ -1,20 +1,26 @@
-
-import React, { useState } from 'react';
-import { DashboardLayout } from '../components/layout/DashboardLayout';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { MarketplaceSettings } from '../components/marketplace/MarketplaceSettings';
-import { MarketplaceOrders } from '../components/marketplace/MarketplaceOrders';
-import { MarketplaceAnalytics } from '../components/marketplace/MarketplaceAnalytics';
-import { ExternalLink, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { mockOrders } from '../data/mockData';
+import { storage } from '@/lib/storage';
+import { ExternalLink, Globe } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { DashboardLayout } from '../components/layout/DashboardLayout';
+import { MarketplaceAnalytics } from '../components/marketplace/MarketplaceAnalytics';
+import { MarketplaceOrders } from '../components/marketplace/MarketplaceOrders';
+import { MarketplaceSettings } from '../components/marketplace/MarketplaceSettings';
 
 const MarketplacePage = () => {
   const [activeTab, setActiveTab] = useState('orders');
+  const [orders, setOrders] = useState([]);
   const { toast } = useToast();
   
+  useEffect(() => {
+    // Load orders from localStorage
+    const storedOrders = storage.getOrders();
+    setOrders(storedOrders);
+  }, []);
+
   const handlePreview = () => {
     // Open the storefront in a new tab
     window.open('/storefront', '_blank');
@@ -25,6 +31,10 @@ const MarketplacePage = () => {
       title: "Storefront Activated",
       description: "Your online store is now live and accessible to customers."
     });
+  };
+
+  const handleOrdersChange = (updatedOrders: any[]) => {
+    setOrders(updatedOrders);
   };
 
   return (
@@ -58,7 +68,7 @@ const MarketplacePage = () => {
                 <CardDescription>Manage and process customer orders from your online store</CardDescription>
               </CardHeader>
               <CardContent>
-                <MarketplaceOrders orders={mockOrders} />
+                <MarketplaceOrders orders={orders} onOrdersChange={handleOrdersChange} />
               </CardContent>
             </Card>
           </TabsContent>

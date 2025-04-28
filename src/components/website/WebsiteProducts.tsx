@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
+import AddProductForm from "@/components/dashboard/AddProductForm";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Search, FileSpreadsheet, Trash2, Pencil } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import AddProductForm from "@/components/dashboard/AddProductForm";
-import { parseCSV, type ProductData } from "@/utils/csvParser";
+import { parseCSV } from "@/utils/csvParser";
+import { FileSpreadsheet, Pencil, Plus, Search, Trash2, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const initialProducts = [
 ];

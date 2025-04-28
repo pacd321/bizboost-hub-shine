@@ -1,7 +1,5 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -13,11 +11,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Check } from 'lucide-react';
-import { Product } from '@/types';
-import { formatCurrency } from '@/lib/currency';
-import { useToast } from '@/hooks/use-toast';
 import { mockWarehouses } from '@/data/mockData';
+import { useToast } from '@/hooks/use-toast';
+import { formatCurrency } from '@/lib/currency';
+import { storage } from '@/lib/storage';
+import { Product } from '@/types';
+import { ArrowLeft, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface CheckoutProps {
   cartItems: Array<{product: Product, quantity: number}>;
@@ -64,23 +65,72 @@ export function Checkout({ cartItems, total, onBackToShopping }: CheckoutProps) 
       return;
     }
     
-    // Simulate API call to process order
-    setTimeout(() => {
-      // This would connect to backend systems to:
-      // 1. Create a customer record if new
-      // 2. Create an order in the system
-      // 3. Update product inventory
-      // 4. Create a delivery record
-      // 5. Process payment
-      
-      setOrderPlaced(true);
-      setLoading(false);
-      
-      toast({
-        title: "Order placed successfully!",
-        description: "Your order has been placed and will be processed shortly."
-      });
-    }, 1500);
+    // Create order data
+    const orderId = uuidv4();
+    const now = new Date().toISOString();
+    
+    // Create customer data
+    const customer = {
+      id: uuidv4(),
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      pincode: formData.pincode,
+      createdAt: now
+    };
+    
+    // Create delivery order
+    const deliveryOrder = {
+      id: uuidv4(),
+      orderId,
+      customer,
+      items: cartItems.map(item => ({
+        productId: item.product.id,
+        productName: item.product.name,
+        quantity: item.quantity,
+        price: item.product.price
+      })),
+      status: 'pending' as const,
+      warehouseId: formData.warehouseId,
+      paymentMethod: formData.paymentMethod,
+      totalAmount: total,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    // Create transaction
+    const transaction = {
+      id: uuidv4(),
+      orderId,
+      amount: total,
+      type: 'income',
+      category: 'sales',
+      description: `Order #${orderId} - ${cartItems.map(item => item.product.name).join(', ')}`,
+      date: now,
+      paymentMethod: formData.paymentMethod
+    };
+    
+    // Save all data to localStorage
+    storage.saveCustomer(customer);
+    storage.saveOrder({
+      ...deliveryOrder,
+      customerId: customer.id // Add required customerId field
+    });
+    storage.saveTransaction({
+      ...transaction,
+      type: 'income' as 'income' | 'expense' // Fix type to be union type
+    });
+    
+    setOrderPlaced(true); 
+    setLoading(false);
+    
+    toast({
+      title: "Order placed successfully!",
+      description: "Your order has been placed and will be processed shortly."
+    });
   };
 
   // Order success screen

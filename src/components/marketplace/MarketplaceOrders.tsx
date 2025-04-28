@@ -1,18 +1,18 @@
-
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/currency';
-import { Search, Eye, PackageOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { formatCurrency } from '@/lib/currency';
+import { Download, Eye, Filter, Package, PackageOpen, Search } from 'lucide-react';
+import { useState } from 'react';
 
 interface Order {
   id: string;
@@ -24,6 +24,7 @@ interface Order {
     city: string;
     state: string;
     pincode: string;
+    phone: string;
   };
   items: Array<{
     productId: string;
@@ -41,9 +42,10 @@ interface Order {
 
 interface MarketplaceOrdersProps {
   orders: Order[];
+  onOrdersChange?: (orders: Order[]) => void;
 }
 
-export function MarketplaceOrders({ orders }: MarketplaceOrdersProps) {
+export function MarketplaceOrders({ orders, onOrdersChange }: MarketplaceOrdersProps) {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -65,7 +67,23 @@ export function MarketplaceOrders({ orders }: MarketplaceOrdersProps) {
   };
   
   const handleUpdateStatus = (newStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled') => {
-    // In a real implementation, this would update the order status in the database
+    if (!selectedOrder) return;
+
+    // Update order status in localStorage
+    const updatedOrders = orders.map(order => 
+      order.id === selectedOrder.id 
+        ? { ...order, status: newStatus, updatedAt: new Date().toISOString() }
+        : order
+    );
+    
+    // Update localStorage
+    localStorage.setItem('bizboost_orders', JSON.stringify(updatedOrders));
+    
+    // Notify parent component
+    if (onOrdersChange) {
+      onOrdersChange(updatedOrders);
+    }
+    
     toast({
       title: "Status Updated",
       description: `Order status changed to ${newStatus}`
@@ -94,120 +112,227 @@ export function MarketplaceOrders({ orders }: MarketplaceOrdersProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search orders..."
-          className="pl-9"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center relative w-full sm:w-auto">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search orders by ID, customer, or status..."
+            className="pl-9 w-full sm:w-[300px]"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+        </div>
       </div>
       
-      <div className="rounded-md border overflow-hidden">
-        <table className="w-full divide-y">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Order ID</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Customer</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Date</th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Amount</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Status</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-muted/50">
-                  <td className="px-4 py-3 text-sm font-medium">#{order.orderId}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <div>{order.customer.name}</div>
-                    <div className="text-xs text-muted-foreground">{order.customer.email}</div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">
-                    {new Date(order.createdAt).toLocaleDateString('en-IN')}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-right font-medium">
-                    {formatCurrency(order.totalAmount)}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    {getStatusBadge(order.status)}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center">
-                    <Button variant="ghost" size="sm" onClick={() => handleViewOrder(order)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4">
+          <div className="flex flex-col">
+            <span className="text-sm text-muted-foreground">Total Orders</span>
+            <span className="text-2xl font-bold">{orders.length}</span>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex flex-col">
+            <span className="text-sm text-muted-foreground">Pending</span>
+            <span className="text-2xl font-bold text-yellow-600">
+              {orders.filter(o => o.status === 'pending').length}
+            </span>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex flex-col">
+            <span className="text-sm text-muted-foreground">Processing</span>
+            <span className="text-2xl font-bold text-blue-600">
+              {orders.filter(o => o.status === 'processing').length}
+            </span>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex flex-col">
+            <span className="text-sm text-muted-foreground">Completed</span>
+            <span className="text-2xl font-bold text-green-600">
+              {orders.filter(o => o.status === 'delivered').length}
+            </span>
+          </div>
+        </Card>
+      </div>
+
+      <Card className="overflow-hidden">
+        <div className="rounded-md border overflow-hidden">
+          <table className="w-full divide-y">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground">Order ID</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground">Customer</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground">Date</th>
+                <th className="px-6 py-4 text-right text-xs font-medium text-muted-foreground">Amount</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground">Status</th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <tr key={order.id} className="hover:bg-muted/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium">#{order.orderId}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(order.createdAt).toLocaleDateString('en-IN')}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{order.customer.name}</span>
+                        <span className="text-xs text-muted-foreground">{order.customer.email}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <span className="font-medium">{formatCurrency(order.totalAmount)}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {getStatusBadge(order.status)}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleViewOrder(order)}
+                        className="hover:bg-primary/10"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <Package className="h-8 w-8 text-muted-foreground" />
+                      <p className="text-muted-foreground">No orders found</p>
+                      <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
+                    </div>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
-                  No orders found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
       
       <Dialog open={viewOrderOpen} onOpenChange={setViewOrderOpen}>
         {selectedOrder && (
           <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle className="flex justify-between items-center">
-                <span>Order #{selectedOrder.orderId}</span>
-                {getStatusBadge(selectedOrder.status)}
+                <div className="flex items-center gap-2">
+                  <span>Order #{selectedOrder.orderId}</span>
+                  {getStatusBadge(selectedOrder.status)}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {new Date(selectedOrder.createdAt).toLocaleDateString('en-IN')}
+                </span>
               </DialogTitle>
             </DialogHeader>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-              <div>
-                <h4 className="font-medium mb-2">Customer Information</h4>
-                <div className="space-y-1 text-sm">
-                  <p><strong>Name:</strong> {selectedOrder.customer.name}</p>
-                  <p><strong>Email:</strong> {selectedOrder.customer.email}</p>
-                  <p className="whitespace-pre-wrap">
-                    <strong>Address:</strong><br />
-                    {selectedOrder.customer.address}<br />
-                    {selectedOrder.customer.city}, {selectedOrder.customer.state} {selectedOrder.customer.pincode}
-                  </p>
+              <Card className="p-4">
+                <h4 className="font-medium mb-3">Customer Information</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Name</span>
+                    <span className="font-medium">{selectedOrder.customer.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Email</span>
+                    <span className="font-medium">{selectedOrder.customer.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Phone</span>
+                    <span className="font-medium">{selectedOrder.customer.phone}</span>
+                  </div>
+                  <div className="mt-4">
+                    <span className="text-muted-foreground block mb-1">Address</span>
+                    <span className="font-medium">
+                      {selectedOrder.customer.address}<br />
+                      {selectedOrder.customer.city}, {selectedOrder.customer.state} {selectedOrder.customer.pincode}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </Card>
               
-              <div>
-                <h4 className="font-medium mb-2">Order Details</h4>
-                <div className="space-y-1 text-sm">
-                  <p><strong>Payment Method:</strong> {selectedOrder.paymentMethod}</p>
-                  <p><strong>Order Date:</strong> {new Date(selectedOrder.createdAt).toLocaleDateString('en-IN')}</p>
-                  <p><strong>Total Amount:</strong> {formatCurrency(selectedOrder.totalAmount)}</p>
-                  {selectedOrder.notes && <p><strong>Notes:</strong> {selectedOrder.notes}</p>}
+              <Card className="p-4">
+                <h4 className="font-medium mb-3">Order Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Payment Method</span>
+                    <span className="font-medium capitalize">{selectedOrder.paymentMethod}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Order Date</span>
+                    <span className="font-medium">
+                      {new Date(selectedOrder.createdAt).toLocaleDateString('en-IN')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Total Amount</span>
+                    <span className="font-medium text-lg">{formatCurrency(selectedOrder.totalAmount)}</span>
+                  </div>
+                  {selectedOrder.notes && (
+                    <div className="mt-4">
+                      <span className="text-muted-foreground block mb-1">Notes</span>
+                      <span className="font-medium">{selectedOrder.notes}</span>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </Card>
             </div>
             
-            <div>
-              <h4 className="font-medium mb-2">Order Items</h4>
+            <Card className="p-4">
+              <h4 className="font-medium mb-3">Order Items</h4>
               <div className="border rounded-md overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-muted/50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium">Product</th>
-                      <th className="px-4 py-2 text-center text-xs font-medium">Quantity</th>
-                      <th className="px-4 py-2 text-right text-xs font-medium">Price</th>
-                      <th className="px-4 py-2 text-right text-xs font-medium">Subtotal</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium">Product</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium">Quantity</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium">Price</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium">Subtotal</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     {selectedOrder.items.map((item) => (
-                      <tr key={item.productId}>
-                        <td className="px-4 py-2 text-sm">{item.productName}</td>
-                        <td className="px-4 py-2 text-sm text-center">{item.quantity}</td>
-                        <td className="px-4 py-2 text-sm text-right">{formatCurrency(item.price)}</td>
-                        <td className="px-4 py-2 text-sm text-right">
+                      <tr key={item.productId} className="hover:bg-muted/50">
+                        <td className="px-4 py-3">
+                          <div className="flex flex-col">
+                            <span className="font-medium">{item.productName}</span>
+                            <span className="text-xs text-muted-foreground">SKU: {item.productId}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">{item.quantity}</td>
+                        <td className="px-4 py-3 text-right">{formatCurrency(item.price)}</td>
+                        <td className="px-4 py-3 text-right font-medium">
                           {formatCurrency(item.price * item.quantity)}
                         </td>
                       </tr>
@@ -215,7 +340,7 @@ export function MarketplaceOrders({ orders }: MarketplaceOrdersProps) {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </Card>
             
             <DialogFooter className="sm:justify-between">
               <div className="flex gap-2">

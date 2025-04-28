@@ -1,15 +1,17 @@
-
-import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { storage } from '@/lib/storage';
+import { CheckCircle, FileText, Upload } from 'lucide-react';
+import React, { useState } from 'react';
+import { createWorker } from 'tesseract.js';
 
 interface OCRUploaderProps {
   onSuccess?: (data: any) => void;
+  mode?: 'inventory' | 'transaction';
 }
 
-export function OCRUploader({ onSuccess }: OCRUploaderProps) {
+export function OCRUploader({ onSuccess, mode = 'inventory' }: OCRUploaderProps) {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -22,7 +24,62 @@ export function OCRUploader({ onSuccess }: OCRUploaderProps) {
     }
   };
 
-  const handleUpload = () => {
+  const extractTransactionData = (text: string) => {
+    // Basic receipt parsing logic
+    const lines = text.split('\n');
+    let amount = 0;
+    let description = '';
+    let date = new Date().toISOString();
+
+    // Look for total amount (common patterns)
+    const totalPatterns = [
+      /total\s*:?\s*(\d+\.?\d*)/i,
+      /amount\s*:?\s*(\d+\.?\d*)/i,
+      /rs\.?\s*(\d+\.?\d*)/i,
+      /₹\s*(\d+\.?\d*)/i
+    ];
+
+    for (const line of lines) {
+      // Try to find amount
+      for (const pattern of totalPatterns) {
+        const match = line.match(pattern);
+        if (match) {
+          amount = parseFloat(match[1]) * 100; // Convert to paise
+          break;
+        }
+      }
+
+      // Try to find date (common formats)
+      const datePatterns = [
+        /\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4}/,
+        /\d{4}[\/\-\.]\d{2}[\/\-\.]\d{2}/
+      ];
+      for (const pattern of datePatterns) {
+        const match = line.match(pattern);
+        if (match) {
+          date = new Date(match[0]).toISOString();
+          break;
+        }
+      }
+
+      // Use first non-empty line as description if not found
+      if (!description && line.trim().length > 0) {
+        description = line.trim();
+      }
+    }
+
+    return {
+      id: `txn_${Date.now()}`,
+      date,
+      description: description || "Receipt Purchase",
+      category: "General",
+      amount,
+      type: "expense" as const,
+      receiptUrl: file ? URL.createObjectURL(file) : ''
+    };
+  };
+
+  const handleUpload = async () => {
     if (!file) {
       toast({
         title: "No File Selected",
@@ -34,23 +91,34 @@ export function OCRUploader({ onSuccess }: OCRUploaderProps) {
 
     setIsUploading(true);
     
-    // Simulate upload
-    setTimeout(() => {
+    try {
+      const worker = await createWorker('eng');
       setIsUploading(false);
       setIsProcessing(true);
-      
-      // Simulate OCR processing
-      setTimeout(() => {
-        setIsProcessing(false);
-        setUploadComplete(true);
-        
+
+      const { data: { text } } = await worker.recognize(file);
+      await worker.terminate();
+
+      if (mode === 'transaction') {
+        const transactionData = extractTransactionData(text);
+        storage.saveTransaction(transactionData);
+
+        toast({
+          title: "Transaction Added",
+          description: "The receipt has been processed and added to your transactions."
+        });
+
+        if (onSuccess) {
+          onSuccess(transactionData);
+        }
+      } else {
+        // Original inventory OCR logic
         toast({
           title: "Invoice Processed Successfully",
           description: "The invoice details have been extracted and added to your inventory."
         });
         
         if (onSuccess) {
-          // Mock extracted data
           const mockExtractedData = {
             vendor: "Supplier Ltd",
             invoiceNumber: "INV-2023-875",
@@ -63,8 +131,19 @@ export function OCRUploader({ onSuccess }: OCRUploaderProps) {
           };
           onSuccess(mockExtractedData);
         }
-      }, 2000);
-    }, 1500);
+      }
+
+      setUploadComplete(true);
+    } catch (error) {
+      toast({
+        title: "Error Processing Receipt",
+        description: "Failed to process the receipt. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+      setIsProcessing(false);
+    }
   };
 
   const handleReset = () => {
@@ -83,9 +162,13 @@ export function OCRUploader({ onSuccess }: OCRUploaderProps) {
               </div>
               
               <div className="space-y-2">
-                <h3 className="font-medium text-lg">Upload Invoice or Receipt</h3>
+                <h3 className="font-medium text-lg">
+                  {mode === 'transaction' ? 'Upload Receipt' : 'Upload Invoice or Receipt'}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  Upload an image of your invoice or receipt, and we'll automatically extract the product details
+                  {mode === 'transaction' 
+                    ? "Upload a receipt image to automatically add it as an expense transaction"
+                    : "Upload an image of your invoice or receipt, and we'll automatically extract the product details"}
                 </p>
               </div>
               
@@ -115,7 +198,7 @@ export function OCRUploader({ onSuccess }: OCRUploaderProps) {
                     className="w-full">
                     {isUploading && "Uploading..."}
                     {isProcessing && "Processing..."}
-                    {!isUploading && !isProcessing && "Extract Data"}
+                    {!isUploading && !isProcessing && (mode === 'transaction' ? "Add Transaction" : "Extract Data")}
                   </Button>
                 </div>
               </div>
@@ -129,7 +212,9 @@ export function OCRUploader({ onSuccess }: OCRUploaderProps) {
               <div className="space-y-2">
                 <h3 className="font-medium text-lg">Processing Complete</h3>
                 <p className="text-sm text-muted-foreground">
-                  We've successfully extracted the details from your document
+                  {mode === 'transaction' 
+                    ? "The receipt has been processed and added to your transactions"
+                    : "We've successfully extracted the details from your document"}
                 </p>
               </div>
               
