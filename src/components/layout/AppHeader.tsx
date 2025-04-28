@@ -2,12 +2,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
@@ -28,7 +28,7 @@ export function AppHeader() {
       <SidebarTrigger />
       
       <div className="flex-1">
-        <h1 className="text-lg font-semibold md:text-xl">StartKaroHub</h1>
+        <h1 className="text-lg font-semibold md:text-xl">BizAarambhPro</h1>
       </div>
 
       <div className="flex items-center gap-4">

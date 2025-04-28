@@ -19,8 +19,8 @@ export function WebsiteSettings() {
     timeZone: 'Asia/Kolkata',
     currency: 'INR',
     dateFormat: 'DD/MM/YYYY',
-    metaTitle: 'StartKaroShop - Quality Products for Business',
-    metaDescription: 'StartKaroShop offers high-quality products for businesses at competitive prices. Shop our extensive catalog now.',
+    metaTitle: 'BizAarambhShop - Quality Products for Business',
+    metaDescription: 'BizAarambhShop offers high-quality products for businesses at competitive prices. Shop our extensive catalog now.',
   });
   
   const [ecommerceSettings, setEcommerceSettings] = useState({

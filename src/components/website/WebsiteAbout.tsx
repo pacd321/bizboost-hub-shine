@@ -14,7 +14,7 @@ export function WebsiteAbout() {
   const [content, setContent] = useState<AboutContent>({
     title: 'About Our Company',
     subtitle: 'Learn more about who we are and what we do',
-    story: 'Founded in 2020, StartKaroShop started as a small online store catering to local businesses. Over the years, we have grown into a trusted supplier of quality products for businesses across the country.\n\nOur mission is to provide businesses with the tools they need to succeed at competitive prices, with excellent customer service.',
+    story: 'Founded in 2020, BizAarambhShop started as a small online store catering to local businesses. Over the years, we have grown into a trusted supplier of quality products for businesses across the country.\n\nOur mission is to provide businesses with the tools they need to succeed at competitive prices, with excellent customer service.',
     mission: 'To empower businesses with high-quality products and exceptional service.',
     vision: 'To become the leading online marketplace for business supplies in the country.',
   });

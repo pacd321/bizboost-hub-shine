@@ -1,19 +1,19 @@
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { defaultTheme, useTheme } from '@/context/ThemeContext';
@@ -42,7 +42,7 @@ export function WebsiteAppearance() {
       showTestimonials: true,
     },
     branding: {
-      storeName: 'StartKaroShop',
+      storeName: 'BizAarambhShop',
       logoUrl: '',
       favicon: '',
       tagline: 'Quality Products for Your Business',

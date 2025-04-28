@@ -5,12 +5,12 @@ export function WebsiteTestimonials() {
     {
       name: 'Rahul Sharma',
       position: 'CEO, TechStart',
-      content: 'StartKaroShop has been a reliable partner for all our office supply needs. Their products are top-notch and the customer service is excellent.'
+      content: 'BizAarambhShop has been a reliable partner for all our office supply needs. Their products are top-notch and the customer service is excellent.'
     },
     {
       name: 'Priya Patel',
       position: 'Owner, Fashion Boutique',
-      content: 'I\'ve been ordering from StartKarofor over a year now. The quality is consistent and delivery is always on time.'
+      content: 'I\'ve been ordering from BizAarambhfor over a year now. The quality is consistent and delivery is always on time.'
     },
     {
       name: 'Amit Kumar',

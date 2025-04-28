@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
@@ -7,8 +6,6 @@ import {
   BarChart2,
   CreditCard,
   Globe,
-  Home,
-  LineChart,
   MessageSquare,
   Package,
   ShoppingCart,
@@ -22,11 +19,11 @@ export function AppSidebar() {
   const { toast } = useToast();
   
   const routes = [
-    {
-      name: 'Dashboard',
-      href: '/',
-      icon: Home,
-    },
+    // {
+    //   name: 'Dashboard',
+    //   href: '/',
+    //   icon: Home,
+    // },
     {
       name: 'Your Website',
       href: '/your-website',
@@ -75,10 +72,10 @@ export function AppSidebar() {
   ];
 
   return (
-    <Sidebar className="border-r bg-background">
-      <div className="flex flex-col gap-2 p-4">
-        <div className="flex h-12 items-center px-2 font-semibold mb-4">
-          <span className="text-lg">StartKaroHub</span>
+    <Sidebar className="border-r bg-black">
+      <div className="flex flex-col bg-[#212121] gap-2 p-4">
+        <div className="flex bg-[#212121] h-12 items-center px-2 font-semibold mb-4">
+          <span className="text-lg">BizAarambhPro</span>
         </div>
         
         {routes.map((route) => {

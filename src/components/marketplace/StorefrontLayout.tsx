@@ -27,7 +27,7 @@ export function StorefrontLayout({ children, cartItemCount = 0 }: StorefrontLayo
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <Link to="/storefront" className="text-2xl font-bold text-primary">
-              StartKaroShop
+              BizAarambhShop
             </Link>
             
             <form onSubmit={handleSearchSubmit} className="w-full max-w-md">
@@ -95,7 +95,7 @@ export function StorefrontLayout({ children, cartItemCount = 0 }: StorefrontLayo
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">StartKaroShop</h3>
+              <h3 className="text-lg font-semibold mb-4">BizAarambhShop</h3>
               <p className="text-sm">
                 Quality products for businesses and individuals.
                 Fast delivery, excellent customer service.
@@ -121,7 +121,7 @@ export function StorefrontLayout({ children, cartItemCount = 0 }: StorefrontLayo
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-6 text-sm text-center">
-            &copy; {new Date().getFullYear()} StartKaroShop. All rights reserved.
+            &copy; {new Date().getFullYear()} BizAarambhShop. All rights reserved.
           </div>
         </div>
       </footer>

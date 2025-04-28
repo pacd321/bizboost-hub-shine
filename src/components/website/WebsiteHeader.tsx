@@ -43,7 +43,7 @@ export function WebsiteHeader({ isAuthenticated, userEmail, onLoginClick, onLogo
               className="text-2xl font-bold"
               style={{ color: theme.primaryColor }}
             >
-              StartKaroShop
+              BizAarambhShop
             </Link>
           </div>
 

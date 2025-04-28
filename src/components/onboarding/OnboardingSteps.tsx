@@ -28,7 +28,7 @@ export function OnboardingSteps({ onComplete }: OnboardingStepsProps) {
       description: "A complete business management platform for small businesses",
       content: (
         <div className="space-y-4 py-4">
-          <p>StartKarohelps you manage your business efficiently with powerful features:</p>
+          <p>BizAarambhhelps you manage your business efficiently with powerful features:</p>
           <ul className="space-y-2">
             <li className="flex items-center">
               <Check className="h-5 w-5 text-green-500 mr-2" />
@@ -118,7 +118,7 @@ export function OnboardingSteps({ onComplete }: OnboardingStepsProps) {
           </div>
           <h3 className="text-xl font-medium mt-4">All Set!</h3>
           <p className="text-gray-500">
-            Your StartKarodashboard is ready. Start exploring the features and boost your business efficiency today!
+            Your BizAarambhdashboard is ready. Start exploring the features and boost your business efficiency today!
           </p>
         </div>
       )
