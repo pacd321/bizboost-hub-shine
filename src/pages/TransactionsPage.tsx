@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/currency';
+import { exportToCSV } from '@/lib/export';
 import { storage } from '@/lib/storage';
 import { Transaction } from '@/types';
 import { Download, Edit, MoreHorizontal, Search, Trash2 } from 'lucide-react';
@@ -43,9 +44,18 @@ const TransactionsPage = () => {
   }, []);
 
   const handleExport = () => {
+    const exportData = filteredTransactions.map(transaction => ({
+      Date: new Date(transaction.date).toLocaleDateString('en-IN'),
+      Description: transaction.description,
+      Category: transaction.category,
+      Amount: formatCurrency(transaction.amount),
+      Type: transaction.type === 'income' ? 'Income' : 'Expense'
+    }));
+
+    exportToCSV(exportData, 'transactions');
     toast({
-      title: "Export Started",
-      description: "Your transactions are being exported to CSV."
+      title: "Export Successful",
+      description: "Your transactions have been exported to CSV."
     });
   };
 

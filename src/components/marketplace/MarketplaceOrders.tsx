@@ -2,15 +2,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/currency';
+import { exportToCSV } from '@/lib/export';
 import { Download, Eye, Filter, Package, PackageOpen, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -111,6 +112,28 @@ export function MarketplaceOrders({ orders, onOrdersChange }: MarketplaceOrdersP
     );
   };
 
+  const handleExport = () => {
+    const exportData = filteredOrders.map(order => ({
+      'Order ID': order.orderId,
+      'Customer Name': order.customer.name,
+      'Customer Email': order.customer.email,
+      'Order Date': new Date(order.createdAt).toLocaleDateString('en-IN'),
+      'Total Amount': formatCurrency(order.totalAmount),
+      'Status': order.status.charAt(0).toUpperCase() + order.status.slice(1),
+      'Payment Method': order.paymentMethod,
+      'Items': order.items.map(item => 
+        `${item.productName} (${item.quantity}x)`
+      ).join('; '),
+      'Shipping Address': `${order.customer.address}, ${order.customer.city}, ${order.customer.state} ${order.customer.pincode}`
+    }));
+
+    exportToCSV(exportData, 'orders');
+    toast({
+      title: "Export Successful",
+      description: "Your orders have been exported to CSV."
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -124,7 +147,7 @@ export function MarketplaceOrders({ orders, onOrdersChange }: MarketplaceOrdersP
           />
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
